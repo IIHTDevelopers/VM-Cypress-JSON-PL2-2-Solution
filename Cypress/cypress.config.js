@@ -1,56 +1,37 @@
-const { defineConfig } = require("cypress");
-const fs = require("fs");
-const path = require("path");
-const customReporter = require("./custom-reporter");
+const { defineConfig } = require('cypress');
+
 
 module.exports = defineConfig({
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    reportDir: 'cypress/reports/mochawesome',
+    overwrite: false,
+    html: true,
+    json: true,
+    charts: true,
+    embeddedScreenshots: true,
+    inlineAssets: true,
+  },
   e2e: {
+    baseUrl: 'https://opensource-demo.orangehrmlive.com/web/index.php/',
+    //baseUrl: 'http://localhost/orangehrm-5.7/web/index.php',
+    supportFile: 'cypress/support/e2e.js',
+    specPattern: 'cypress/e2e/**/*.cy.js',
+    
     setupNodeEvents(on, config) {
-      // Attach custom reporter
-      customReporter(on);
-      this.retries = 2,
+      // Register Mochawesome plugin
+      require('cypress-mochawesome-reporter/plugin')(on);
 
-      // Register tasks
-      on("task", {
-        deleteFile(filePath) {
-          const fullPath = path.resolve(filePath);
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-            console.log(`Deleted: ${fullPath}`);
-          } else {
-            console.log(`File not found: ${fullPath}`);
-          }
+      // Register custom task
+      on('task', {
+        logMessage(message) {
+          console.log('LOG FROM TEST:', message);
           return null;
-        },
-        findExcelFile() {
-          const downloadsFolder = path.join(__dirname, "cypress", "downloads");
-          const files = fs.readdirSync(downloadsFolder);
-          return files.some(
-            (file) => file.endsWith(".xlsx") || file.endsWith(".xls")
-          );
-        },
-      });
-
-      on("task", {
-        fileExists(path) {
-          return fs.existsSync(path);
-        },
-        deleteFile(path) {
-          if (fs.existsSync(path)) {
-            fs.unlinkSync(path);
-          }
-          return null;
-        },
+        }
       });
 
       return config;
     },
-
-    specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
-    defaultCommandTimeout: 5000,
-    watchForFileChanges: false,
   },
-
-  viewportWidth: 1536,
-  viewportHeight: 720,
 });
+// This configuration sets up Cypress with Mochawesome reporter for generating test reports.
