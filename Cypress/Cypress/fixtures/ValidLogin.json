@@ -1,0 +1,18 @@
+{
+  "ValidLogin": [
+    {
+      "ValidUserName": "admin"
+    },
+    {
+      "ValidPassword": "pass123"
+    }
+  ],
+  "InvalidLogin": [
+    {
+      "InvalidUserName": "adsfsd"
+    },
+    {
+      "InvalidPassword": "asfasdas"
+    }
+  ]
+}
